@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include <stdint.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -46,6 +47,11 @@ DMA_HandleTypeDef hdma_adc1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+#define SAMPLE_BUFFER_SIZE 100
+#define TRANSMIT_BUFFER_SIZE 200
+
+uint16_t sample_buffer[SAMPLE_BUFFER_SIZE]; // buffer to hold raw samples
+uint32_t transmit_buffer[TRANSMIT_BUFFER_SIZE]; // buffer to hold feature vectors
 
 /* USER CODE END PV */
 
@@ -97,6 +103,12 @@ int main(void)
   MX_USART2_UART_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
+
+  /* Link DMA to sampling buffer to hold ADC conversions */
+  HAL_ADC_Start_DMA(&hadc1, (uint16_t*)sample_buffer, SAMPLE_BUFFER_SIZE);
+
+  /* Link DMA to transmit buffer to hold extracted data before transmission */
+  HAL_UART_Transmit_Start_DMA(&huart2, );
 
   /* USER CODE END 2 */
 
@@ -254,7 +266,7 @@ static void MX_DMA_Init(void)
 
   /* DMA interrupt init */
   /* DMA2_Stream0_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 2, 0);
   HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
 
 }
