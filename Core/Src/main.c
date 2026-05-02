@@ -47,10 +47,12 @@ TIM_HandleTypeDef htim1;
 DMA_HandleTypeDef hdma_tim1_trig;
 
 UART_HandleTypeDef huart2;
+UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 #define SAMPLE_BUFFER_SIZE 100
 #define TRANSMIT_BUFFER_SIZE 200
+#define SAMPLING_START "Sampling has started.\n"
 
 volatile int half_full = 0; // flag for half full sample buffer DMA interrupt
 volatile int full = 0; // flag for full sample buffer DMA interrupt
@@ -72,6 +74,7 @@ static void MX_DMA_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM1_Init(void);
+static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -128,10 +131,12 @@ int main(void)
   MX_USART2_UART_Init();
   MX_ADC1_Init();
   MX_TIM1_Init();
+  MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 
   /* Link DMA to sampling buffer to hold ADC conversions */
   HAL_ADC_Start_DMA(&hadc1, (uint16_t*)sample_buffer, SAMPLE_BUFFER_SIZE);
+  HAL_UART_Transmit_DMA(&huart)
 
   /* Link DMA to transmit buffer to hold extracted data before transmission */
   //HAL_UART_Transmit_DMA(&huart2, (uint8_t*)transmit_buffer, );
@@ -337,6 +342,39 @@ static void MX_USART2_UART_Init(void)
   /* USER CODE BEGIN USART2_Init 2 */
 
   /* USER CODE END USART2_Init 2 */
+
+}
+
+/**
+  * @brief USART3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART3_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART3_Init 0 */
+
+  /* USER CODE END USART3_Init 0 */
+
+  /* USER CODE BEGIN USART3_Init 1 */
+
+  /* USER CODE END USART3_Init 1 */
+  huart3.Instance = USART3;
+  huart3.Init.BaudRate = 115200;
+  huart3.Init.WordLength = UART_WORDLENGTH_8B;
+  huart3.Init.StopBits = UART_STOPBITS_1;
+  huart3.Init.Parity = UART_PARITY_NONE;
+  huart3.Init.Mode = UART_MODE_TX;
+  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART3_Init 2 */
+
+  /* USER CODE END USART3_Init 2 */
 
 }
 
