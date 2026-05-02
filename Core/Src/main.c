@@ -50,8 +50,13 @@ UART_HandleTypeDef huart2;
 #define SAMPLE_BUFFER_SIZE 100
 #define TRANSMIT_BUFFER_SIZE 200
 
+typedef struct {
+	uint16_t energy; // the amount of energy produced by the sound
+	uint16_t zcr; // rate of sound's inversion from positive to negative
+} featureVector; // vector to hold extracted features from raw data
+
 uint16_t sample_buffer[SAMPLE_BUFFER_SIZE]; // buffer to hold raw samples
-uint32_t transmit_buffer[TRANSMIT_BUFFER_SIZE]; // buffer to hold feature vectors
+featureVector transmit_buffer[TRANSMIT_BUFFER_SIZE]; // buffer to hold feature vectors
 
 /* USER CODE END PV */
 
@@ -108,7 +113,7 @@ int main(void)
   HAL_ADC_Start_DMA(&hadc1, (uint16_t*)sample_buffer, SAMPLE_BUFFER_SIZE);
 
   /* Link DMA to transmit buffer to hold extracted data before transmission */
-  HAL_UART_Transmit_Start_DMA(&huart2, );
+  HAL_UART_Transmit_DMA(&huart2, (uint8_t*)transmit_buffer, );
 
   /* USER CODE END 2 */
 
