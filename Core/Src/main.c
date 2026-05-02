@@ -18,7 +18,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include <stdint.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -50,6 +49,9 @@ UART_HandleTypeDef huart2;
 #define SAMPLE_BUFFER_SIZE 100
 #define TRANSMIT_BUFFER_SIZE 200
 
+volatile int half_full = 0; // flag for half full sample buffer DMA interrupt
+volatile int full = 0; // flag for full sample buffer DMA interrupt
+
 typedef struct {
 	uint16_t energy; // the amount of energy produced by the sound
 	uint16_t zcr; // rate of sound's inversion from positive to negative
@@ -72,6 +74,20 @@ static void MX_ADC1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+// Raises flag whenever sample buffer is half full and DMA interrupt fires
+void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef* hadc){
+	if(hadc->Instance == ADC1){
+		half_full = 1;
+	}
+}
+
+// Raises flag whenever sample buffer is completely full and DMA interrupt fires
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
+	if(hadc->Instance == ADC1){
+		full = 1;
+	}
+}
 
 /* USER CODE END 0 */
 
@@ -113,7 +129,7 @@ int main(void)
   HAL_ADC_Start_DMA(&hadc1, (uint16_t*)sample_buffer, SAMPLE_BUFFER_SIZE);
 
   /* Link DMA to transmit buffer to hold extracted data before transmission */
-  HAL_UART_Transmit_DMA(&huart2, (uint8_t*)transmit_buffer, );
+  //HAL_UART_Transmit_DMA(&huart2, (uint8_t*)transmit_buffer, );
 
   /* USER CODE END 2 */
 
@@ -271,7 +287,7 @@ static void MX_DMA_Init(void)
 
   /* DMA interrupt init */
   /* DMA2_Stream0_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 2, 0);
+  HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
 
 }
@@ -294,21 +310,11 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : LD2_Pin */
-  GPIO_InitStruct.Pin = LD2_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
