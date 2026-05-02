@@ -203,7 +203,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
     hdma_tim1_trig.Init.MemInc = DMA_MINC_ENABLE;
     hdma_tim1_trig.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
     hdma_tim1_trig.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-    hdma_tim1_trig.Init.Mode = DMA_CIRCULAR;
+    hdma_tim1_trig.Init.Mode = DMA_NORMAL;
     hdma_tim1_trig.Init.Priority = DMA_PRIORITY_LOW;
     hdma_tim1_trig.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
     if (HAL_DMA_Init(&hdma_tim1_trig) != HAL_OK)
@@ -221,7 +221,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
     hdma_tim1_up.Init.MemInc = DMA_MINC_ENABLE;
     hdma_tim1_up.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
     hdma_tim1_up.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-    hdma_tim1_up.Init.Mode = DMA_CIRCULAR;
+    hdma_tim1_up.Init.Mode = DMA_NORMAL;
     hdma_tim1_up.Init.Priority = DMA_PRIORITY_LOW;
     hdma_tim1_up.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
     if (HAL_DMA_Init(&hdma_tim1_up) != HAL_OK)
