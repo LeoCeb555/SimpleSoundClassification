@@ -134,9 +134,10 @@ int main(void)
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  /* Link DMA to sampling buffer to hold ADC conversions */
+  // Link DMA to sampling buffer to hold ADC conversions
   HAL_ADC_Start_DMA(&hadc1, (uint16_t*)sample_buffer, SAMPLE_BUFFER_SIZE);
-  HAL_UART_Transmit_DMA(&huart)
+  // Link DMA to our timer start notification for UART transmission
+  HAL_UART_Transmit_DMA(&huart3, (unint8_t*)SAMPLING_START, 22);
 
   /* Link DMA to transmit buffer to hold extracted data before transmission */
   //HAL_UART_Transmit_DMA(&huart2, (uint8_t*)transmit_buffer, );
