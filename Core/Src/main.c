@@ -91,20 +91,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 	}
 }
 
-// Interrupts when blue button is pushed
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
-	if(GPIO_Pin == B1_Pin){
-
-	}
-}
-
-//	Interrupt when the timer starts
-void HAL_TIM_Base_Start_IT(TIM_HandleTypeDef* htim){
-	if(htim->Instance == TIM1){
-
-	}
-}
-
 // Interrupt when the timer detects the trigger falling edge
 void HAL_TIM_Trigger_Callback(TIM_HandleTypeDef* htim){
 	if(htim->Instance == TIM1){
@@ -128,13 +114,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim){
 		HAL_ADC_Start_DMA(&hadc1, (uint32_t*)sample_buffer, SAMPLE_BUFFER_SIZE);
 		// Re-arm timer 1
 		HAL_TIM_Base_Start_IT(htim);
-	}
-}
-
-// Interrupts when UART TX register is ready to receive new data
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart){
-	if(huart->Instance == USART3){
-
 	}
 }
 

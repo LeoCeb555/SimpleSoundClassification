@@ -25,7 +25,6 @@
 /* USER CODE END 0 */
 
 TIM_HandleTypeDef htim1;
-DMA_HandleTypeDef hdma_tim1_trig;
 
 /* TIM1 init function */
 void MX_TIM1_Init(void)
@@ -105,25 +104,6 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
     GPIO_InitStruct.Alternate = GPIO_AF1_TIM1;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    /* TIM1 DMA Init */
-    /* TIM1_TRIG Init */
-    hdma_tim1_trig.Instance = DMA2_Stream0;
-    hdma_tim1_trig.Init.Channel = DMA_CHANNEL_6;
-    hdma_tim1_trig.Init.Direction = DMA_PERIPH_TO_MEMORY;
-    hdma_tim1_trig.Init.PeriphInc = DMA_PINC_DISABLE;
-    hdma_tim1_trig.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_tim1_trig.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-    hdma_tim1_trig.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-    hdma_tim1_trig.Init.Mode = DMA_NORMAL;
-    hdma_tim1_trig.Init.Priority = DMA_PRIORITY_LOW;
-    hdma_tim1_trig.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-    if (HAL_DMA_Init(&hdma_tim1_trig) != HAL_OK)
-    {
-      Error_Handler();
-    }
-
-    __HAL_LINKDMA(tim_baseHandle,hdma[TIM_DMA_ID_TRIGGER],hdma_tim1_trig);
-
     /* TIM1 interrupt Init */
     HAL_NVIC_SetPriority(TIM1_UP_TIM10_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(TIM1_UP_TIM10_IRQn);
@@ -148,9 +128,6 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
     PA8     ------> TIM1_CH1
     */
     HAL_GPIO_DeInit(GPIOA, GPIO_PIN_8);
-
-    /* TIM1 DMA DeInit */
-    HAL_DMA_DeInit(tim_baseHandle->hdma[TIM_DMA_ID_TRIGGER]);
 
     /* TIM1 interrupt Deinit */
     HAL_NVIC_DisableIRQ(TIM1_UP_TIM10_IRQn);
