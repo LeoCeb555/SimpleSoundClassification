@@ -96,28 +96,36 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 // Interrupts when blue button is pushed
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if(GPIO_Pin == B1_Pin){
+
+	}
+}
+
+//	Interrupt when the timer starts
+void HAL_TIM_Base_Start_IT(TIM_HandleTypeDef* htim){
+	if(htim->Instance == TIM1){
 		// Start DMA transfer of sampling start notification to UART port
 		HAL_UART_Transmit_DMA(&huart3, (uint8_t*)SAMPLING_MESSAGE, START_MESSAGE_LENGTH);
 		// Start DMA transfer to sampling buffer to hold ADC conversions
 		HAL_ADC_Start_DMA(&hadc1, (uint32_t*)sample_buffer, SAMPLE_BUFFER_SIZE);
-		// Start timer for sampling window
-		HAL_TIM_Base_Start(&htim1);
 	}
 }
 
 // Interrupts when timer overflows
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim){
 	if(htim->Instance == TIM1){
+		// Stop the timer
+		HAL_TIM_Base_Stop(&htim1);
 		// End DMA transfer from ADC (stop recording samples)
 		HAL_ADC_Stop_DMA(&hadc1);
+		// Start DMA transfer of sampling end notification to UART
+		HAL_UART_Transmit_DMA(&huart3, (uint8_t*)SAMPLING_MESSAGE + START_MESSAGE_LENGTH, END_MESSAGE_LENGTH);
 	}
 }
 
 // Interrupts when UART TX register is ready to receive new data
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart){
 	if(huart->Instance == USART3){
-		// Start DMA transfer of sampling end notification to UART
-		HAL_UART_Transmit_DMA(&huart3, (uint8_t*)SAMPLING_MESSAGE + START_MESSAGE_LENGTH, END_MESSAGE_LENGTH);
+
 	}
 }
 
