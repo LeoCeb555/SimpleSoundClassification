@@ -62,8 +62,6 @@ typedef struct {
 /* USER CODE BEGIN PV */
 volatile int half_full = 0; // flag for half full sample buffer DMA interrupt
 volatile int full = 0; // flag for full sample buffer DMA interrupt
-volatile int timer_start = 0; // flag for timer start
-volatile int timer_end = 0; // flag for timer end
 
 uint16_t sample_buffer[SAMPLE_BUFFER_SIZE]; // buffer to hold raw samples
 featureVector transmit_buffer[TRANSMIT_BUFFER_SIZE]; // buffer to hold feature vectors
@@ -103,22 +101,33 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 //	Interrupt when the timer starts
 void HAL_TIM_Base_Start_IT(TIM_HandleTypeDef* htim){
 	if(htim->Instance == TIM1){
+
+	}
+}
+
+// Interrupt when the timer detects the trigger falling edge
+void HAL_TIM_Trigger_Callback(TIM_HandleTypeDef* htim){
+	if(htim->Instance == TIM1){
 		// Start DMA transfer of sampling start notification to UART port
 		HAL_UART_Transmit_DMA(&huart3, (uint8_t*)SAMPLING_MESSAGE, START_MESSAGE_LENGTH);
-		// Start DMA transfer to sampling buffer to hold ADC conversions
-		HAL_ADC_Start_DMA(&hadc1, (uint32_t*)sample_buffer, SAMPLE_BUFFER_SIZE);
 	}
 }
 
 // Interrupts when timer overflows
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim){
 	if(htim->Instance == TIM1){
-		// Stop the timer
-		HAL_TIM_Base_Stop(&htim1);
-		// End DMA transfer from ADC (stop recording samples)
+		// Manually stop timer 1 to prevent looping
+		HAL_TIM_Base_Stop_IT(htim);
+		// Manually stop ADC-DMA transfer (stop recording samples) to setup for next sampling period
 		HAL_ADC_Stop_DMA(&hadc1);
+
 		// Start DMA transfer of sampling end notification to UART
 		HAL_UART_Transmit_DMA(&huart3, (uint8_t*)SAMPLING_MESSAGE + START_MESSAGE_LENGTH, END_MESSAGE_LENGTH);
+
+		// Re-arm DMA by linking it to sampling buffer to hold ADC conversions
+		HAL_ADC_Start_DMA(&hadc1, (uint32_t*)sample_buffer, SAMPLE_BUFFER_SIZE);
+		// Re-arm timer 1
+		HAL_TIM_Base_Start_IT(htim);
 	}
 }
 
@@ -166,6 +175,11 @@ int main(void)
   MX_TIM1_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
+
+  // Arm DMA by linking it to sampling buffer to hold ADC conversions
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)sample_buffer, SAMPLE_BUFFER_SIZE);
+  // Arm timer 1
+  HAL_TIM_Base_Start_IT(&htim1);
 
   /* USER CODE END 2 */
 
