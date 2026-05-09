@@ -70,8 +70,8 @@ void MX_TIM1_Init(void)
   {
     Error_Handler();
   }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_ENABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
   {
     Error_Handler();
@@ -112,8 +112,8 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
     hdma_tim1_trig.Init.Direction = DMA_PERIPH_TO_MEMORY;
     hdma_tim1_trig.Init.PeriphInc = DMA_PINC_DISABLE;
     hdma_tim1_trig.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_tim1_trig.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-    hdma_tim1_trig.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+    hdma_tim1_trig.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_tim1_trig.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
     hdma_tim1_trig.Init.Mode = DMA_NORMAL;
     hdma_tim1_trig.Init.Priority = DMA_PRIORITY_LOW;
     hdma_tim1_trig.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
